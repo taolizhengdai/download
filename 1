@@ -1,0 +1,6 @@
+CPUNO=`cat /proc/cpuinfo|grep processor|wc -l`
+export GOMP_CPU_AFFINITY=0-$[CPUNO - 1]
+
+#sysctl -w vm.min_free_kbytes=112640 &> /dev/null
+sysctl -w vm.dirty_ratio=60 &> /dev/null
+sysctl -w kernel.sched_autogroup_enabled=0 &> /dev/null
