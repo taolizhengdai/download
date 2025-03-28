@@ -1,0 +1,104 @@
+section .data
+    hash    db '#'   ; 定义'#'字符
+    space   db ' '   ; 定义空格字符
+    newline db 10    ; 定义换行符（ASCII码10）
+
+section .text
+    global _start
+
+_start:
+    mov ecx, 6       ; 设置行计数器为6（正方形边长）
+
+print_line:
+    ; 检查是否是第一行或最后一行
+    cmp ecx, 6       ; 如果是第一行
+    je print_full_line
+    cmp ecx, 1       ; 如果是最后一行
+    je print_full_line
+
+    ; 否则打印空心行
+    call print_hollow_line
+    jmp next_line
+
+print_full_line:
+    call print_solid_line
+
+next_line:
+    ; 打印换行符
+    mov eax, 4       ; sys_write系统调用
+    mov ebx, 1       ; 标准输出
+    mov ecx, newline ; 要写入的数据
+    mov edx, 1       ; 写入1字节
+    int 0x80         ; 调用内核
+
+    dec ecx          ; 减少行计数器
+    jnz print_line   ; 如果计数器不为0，继续循环
+
+    ; 退出程序
+    mov eax, 1       ; sys_exit系统调用
+    xor ebx, ebx     ; 退出状态码0
+    int 0x80         ; 调用内核
+
+print_solid_line:
+    push ecx         ; 保存行计数器
+    mov ecx, 11      ; 每行需要打印11个字符（6个'#'和5个空格）
+
+solid_loop:
+    ; 交替打印'#'和空格
+    test ecx, 1      ; 检查ecx是否为奇数
+    jnz print_hash
+
+    ; 打印空格
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, space
+    mov edx, 1
+    int 0x80
+    jmp solid_next
+
+print_hash:
+    ; 打印'#'
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, hash
+    mov edx, 1
+    int 0x80
+
+solid_next:
+    dec ecx
+    jnz solid_loop
+    pop ecx          ; 恢复行计数器
+    ret
+
+print_hollow_line:
+    push ecx         ; 保存行计数器
+    mov ecx, 11      ; 每行需要打印11个字符
+
+hollow_loop:
+    ; 如果是第一个或最后一个字符，打印'#'，否则打印空格
+    cmp ecx, 11      ; 第一个字符
+    je print_hash_hollow
+    cmp ecx, 1       ; 最后一个字符
+    je print_hash_hollow
+
+    ; 打印空格
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, space
+    mov edx, 1
+    int 0x80
+    jmp hollow_next
+
+print_hash_hollow:
+    ; 打印'#'
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, hash
+    mov edx, 1
+    int 0x80
+
+hollow_next:
+    dec ecx
+    jnz hollow_loop
+    pop ecx          ; 恢复行计数器
+    ret
