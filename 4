@@ -1,0 +1,23 @@
+```nasm
+section .data
+line_h db '------', 0dh, 0ah, '$' ; 每条水平线：六个'-'加上换行符。
+line_v db '|',' ','|', 0dh, 0ah,'$' ; 每条竖直线：左边一个'|'，中间四个空格，右边一个'|'。
+section .code
+start:
+call print_hline ; 先打印第一条水平线。
+mov cx, 6 ; 循环六次。
+loop_main:
+call print_vline ; 打印竖直线。
+call print_hline ; 打印水平线。
+loop loop_main ; 继续循环直到CX=0。
+print_hline:
+mov dx, offset line_h
+mov ah, 09h ; 调用DOS中断显示字符串。
+int 21h ; 显示line_h。
+ret
+print_vline:
+mov dx, offset line_v
+mov ah, 09h
+int 21h
+ret
+end start
