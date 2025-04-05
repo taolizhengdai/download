@@ -1,0 +1,49 @@
+                                  %use masm
+
+                           %include "io_linux.inc"
+section .data
+
+ const1    db  100,100d,01100100b,64h,'d'
+
+ const2    db  1,+127,128,-128,255,-1
+
+           db  105,-105,32,-32,32h,-32h
+
+ const4    db  '0123456789','abcxyz','ABCXYZ'
+
+ crlf      db   0dh,0ah,0
+
+ minint    equ 10
+
+ maxint    equ 0ffh
+
+ const5    db minint,minint+5,maxint-5,maxint-minint
+
+ const6    db 4*4,34h+34,67h-52h,52h-67h
+
+ array     dw 1,2,3,4,5,6,7,8,9,10
+
+ wvar      dw 5678h
+
+ dvar      dd 9abcdef0h,1,2
+
+ bvar4     times 5 db '$'
+
+ bvar5     times minint db 0
+
+           times 2 db 2,3,4,4
+                                  section .text
+
+                                    global _start
+
+                                       _start:
+
+                    mov eax,const4
+
+                    call dispmsg
+
+                                         exit
+
+                mov eax,1
+
+                  int 0x80
